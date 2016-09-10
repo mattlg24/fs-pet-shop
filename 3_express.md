@@ -78,7 +78,7 @@ git br -d express_server
 
 In future parts of this assignment, your server will need to handle create, update, and destroy HTTP commands. For now, add a route handler that responds to create commands by adding new pets to the database.
 
-| Request Method | Request URL | Request Body                                            | Response Status | Response Content-Type | Response Body                                           |
+  | Request Method | Request URL | Request Body                                            | Response Status | Response Content-Type | Response Body                                           |
 |----------------|-------------|---------------------------------------------------------|-----------------|-----------------------|---------------------------------------------------------|
 | `POST`         | `/pets`     | `{ "name": "Cornflake", "age": 3, "kind": "parakeet" }` | `200`           | `application/json`    | `{ "name": "Cornflake", "age": 3, "kind": "parakeet" }` |
 | `GET`          | `/pets/3`   | N/A                                                     | `200`           | `application/json`    | `{ "name": "Cornflake", "age": 3, "kind": "parakeet" }` |
