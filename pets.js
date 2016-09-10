@@ -16,7 +16,7 @@ app.get('/pets', function(req, res) {
     fs.readFile(petsPath, 'utf8', function(err, petsJSON) {
         if (err) {
             console.error('Error: ', err);
-            res.status(500).send('Something broke')
+            res.status(500).send('Something broke!')
         }
 
         var pets = JSON.parse(petsJSON)
@@ -29,14 +29,14 @@ app.get('/pets/:id', function(req, res) {
     fs.readFile(petsPath, 'utf8', function(err, petsJSON) {
         if (err) {
             console.error('Error: ', err);
-            res.status(500).send('Something broke')
+            res.status(500).send('Something broke!')
         }
 
         let id = Number.parseInt(req.params.id)
         let pets = JSON.parse(petsJSON)
 
         if (id < 0 || id >= pets.length || Number.isNaN(id)) {
-            res.status(404).send('Sorry can\'t find that')
+            res.status(404).send('Sorry can\'t find that!')
         }
 
         res.set('content-Type', 'text/plain')
