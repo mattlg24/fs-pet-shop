@@ -3,7 +3,11 @@
     "kind": "rainbow",
     "name": "fido"
 }, {
-    "age": 2,
-    "kind": "cat",
-    "name": "Ralph"
+    "age": 5,
+    "kind": "snake",
+    "name": "Tom"
+}, {
+    "age": 3,
+    "kind": "parakeet",
+    "name": "Cornflake"
 }]
