@@ -114,6 +114,35 @@ app.put('/pets/:id', function(req, res) {
     })
 })
 
+app.delete('/pets/:id', function(req, res) {
+    fs.readFile(petsPath, 'utf8', function(readErr, petsJSON) {
+        if (readErr) {
+            console.error('Error: ', readErr);
+            res.status(500).send('Something broke!')
+        }
+
+        let id = Number.parseInt(req.params.id)
+        let pets = JSON.parse(petsJSON)
+
+        if (id < 0 || id >= pets.length || Number.isNaN(id)) {
+            res.status(404).send('Sorry can\'t find that!')
+        }
+
+        let pet = pets.splice(id, 1)[0]
+        let newPetsJSON = JSON.stringify(pets)
+
+        fs.writeFile(petsPath, newPetsJSON, function(writeErr) {
+            if (writeErr) {
+                console.error('Error: ', writeErr);
+                res.status(500).send('Something broke!')
+            }
+
+            res.set('Content-Type', 'text/plain')
+            res.send(pet)
+        })
+    })
+})
+
 app.get('/pets/:id', function(req, res) {
     fs.readFile(petsPath, 'utf8', function(err, newPetsJSON) {
         if (err) {
