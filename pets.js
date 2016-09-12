@@ -8,14 +8,20 @@ let express = require('express')
 let app = express()
 let port = process.env.PORT || 8000
 
-let node = path.basename(process.argv[0])
-let file = path.basename(process.argv[1])
-let cmd = process.argv[2]
+let morgan = require('morgan')
+let bodyParser = require('body-parser')
+
+app.use(morgan('short'))
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({
+    extended: true
+}))
 
 app.get('/pets', function(req, res) {
     fs.readFile(petsPath, 'utf8', function(err, petsJSON) {
         if (err) {
             console.error('Error: ', err);
+            console.error(err.stack);
             res.status(500).send('Something broke!')
         }
 
@@ -25,15 +31,99 @@ app.get('/pets', function(req, res) {
     })
 })
 
-app.get('/pets/:id', function(req, res) {
-    fs.readFile(petsPath, 'utf8', function(err, petsJSON) {
-        if (err) {
+app.post('/pets', function(req, res) {
+    fs.readFile(petsPath, 'utf8', function(readErr, petsJSON) {
+        if (readErr) {
+            console.error('Error: ', err);
+            res.status(500).send('Something broke!')
+        }
+
+        let pets = JSON.parse(petsJSON)
+        let pet = {
+            age: parseInt(req.body.age),
+            kind: req.body.kind,
+            name: req.body.name
+        }
+
+        if (!pet) {
+            res.status(400).send('Sorry can\'t find that!')
+        } else if (pet.name === '' || pet.kind === '') {
+            res.status(400).send('Sorry can\'t find that!')
+        } else if (isNaN(pet.age)) {
+            res.status(400).send('Sorry can\'t find that!')
+        } else {
+            pets.push(pet)
+        }
+
+
+        let newPetsJSON = JSON.stringify(pets)
+
+        fs.writeFile(petsPath, newPetsJSON, function(writeErr) {
+            if (writeErr) {
+                console.error('Error: ', writeErr);
+                res.status(500).send('Something broke!')
+            }
+
+            res.set('Content-Type', 'text/plain')
+            res.send(pet)
+        })
+    })
+})
+
+app.put('/pets/:id', function(req, res) {
+    fs.readFile(petsPath, 'utf8', function(readErr, petsJSON) {
+        if (readErr) {
             console.error('Error: ', err);
             res.status(500).send('Something broke!')
         }
 
         let id = Number.parseInt(req.params.id)
         let pets = JSON.parse(petsJSON)
+
+        if (id < 0 || id >= pets.length || Number.isNaN(id)) {
+            res.status(404).send('Sorry can\'t find that!')
+        }
+
+        let pet = {
+            age: parseInt(req.body.age),
+            kind: req.body.kind,
+            name: req.body.name
+        }
+
+        if (!pet) {
+            res.status(400).send('Sorry can\'t find that!')
+        } else if (pet.name === '' || pet.kind === '') {
+            res.status(400).send('Sorry can\'t find that!')
+        } else if (isNaN(pet.age)) {
+            res.status(400).send('Sorry can\'t find that!')
+        }
+
+        pets[id] = pet
+
+        let newPetsJSON = JSON.stringify(pets)
+
+        fs.writeFile(petsPath, newPetsJSON, function(writeErr) {
+            if (writeErr) {
+                console.error('Error: ', writeErr);
+                res.status(500).send('Something broke!')
+            }
+
+            res.set('Content-Type', 'text/plain')
+            res.send(pet)
+        })
+    })
+})
+
+app.get('/pets/:id', function(req, res) {
+    fs.readFile(petsPath, 'utf8', function(err, newPetsJSON) {
+        if (err) {
+            console.error('Error: ', err);
+            console.error(err.stack);
+            res.status(500).send('Something broke!')
+        }
+
+        let id = Number.parseInt(req.params.id)
+        let pets = JSON.parse(newPetsJSON)
 
         if (id < 0 || id >= pets.length || Number.isNaN(id)) {
             res.status(404).send('Sorry can\'t find that!')
@@ -47,68 +137,6 @@ app.get('/pets/:id', function(req, res) {
 app.use(function(req, res) {
     res.status(404).send('Sorry can\'t find that')
 })
-
-// app.use(function(req, res) {
-//             res.status(404).send("Page not found")
-//         }
-
-
-// if (cmd === 'read') {
-//     fs.readFile(petsPath, 'utf8', function(err, data) {
-//         let index = process.argv[3]
-//         if (err) {
-//             throw err
-//         }
-//         let pets = JSON.parse(data)
-//         if (index > pets.length - 1 || index < 0) {
-//             console.log(`Usage: ${node} ${file} read INDEX`);
-//         } else if (index === undefined) {
-//             console.log(pets)
-//         } else {
-//             console.log(pets[index]);
-//         }
-//     })
-//
-// } else if (cmd === 'create') {
-//     fs.readFile(petsPath, 'utf8', function(createErr, data) {
-//         if (createErr) {
-//             throw createErr
-//         }
-//
-//         var pets = JSON.parse(data)
-//         var age = process.argv[3]
-//         var kind = process.argv[4]
-//         var name = process.argv[5]
-//
-//         if (!age || !kind || !name) {
-//             console.log(`Usage: ${node} ${file} ${cmd} AGE KIND NAME`);
-//             process.exit(1)
-//         }
-//
-//         var pet = {
-//             age: age,
-//             kind: kind,
-//             name: name
-//         }
-//
-//         pets.push(pet)
-//
-//         var petsJSON = JSON.stringify(pets)
-//
-//         fs.writeFile(petsPath, petsJSON, function(writeErr) {
-//             if (writeErr) {
-//                 throw writeErr
-//             }
-//             console.log(pet);
-//         })
-//
-//     })
-
-// }
-// else {
-//     console.error(`Usage: ${node} ${path} read`)
-//     process.exit(1)
-// }
 
 app.listen(port, function() {
     console.log('Listening on port ', port);
