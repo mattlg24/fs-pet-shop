@@ -10,3 +10,8 @@ This is a multi-day assignment split into the following parts. Your task is to c
 Additionally, each part has a set of optional bonus assignments to try once you completed the its main assignment. Since parts share many of the same bonus assignments, you may move to the next part without having finished all the bonuses.
 
 The [solutions](https://github.com/gSchool/fs-pet-shop-solutions) are available to instructors as well as students who've completed this series.
+
+
+Link to Heroku:
+https://mattlg24-pet-shop.herokuapp.com/pets
+(note: the link is not currently working. I'm still troubleshooting.)
